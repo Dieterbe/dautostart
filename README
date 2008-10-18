@@ -1,12 +1,14 @@
 dautostart is a simple standalone script that autostarts applications according to the
 freedesktop autostart spec ( http://standards.freedesktop.org/autostart-spec/autostart-spec-latest.html )
-
 It's intended for end-users building their own environment (although
-everyone - including DE projects - is free to use this)
+everyone - including DE developers - can use this)
 
-It's written in sh.  It only depends on sh. nothing else.
 
-Currently dautostart is in a very early phase of development and not ready
-for production use.
+Dependencies: sh. nothing else.
+Licensce:     GPL3. See COPYING.
 
-This software is licensed using the GPL3 license.  See COPYING.
+
+Notes:
+ * Currently dautostart is in a very early phase of development and not ready for production use.  Check the TODO file for things that are not finished yet.
+ * If you want to use the OnlyShowIn and NotShowIn directives in .desktop files, export the DESKTOP_ENVIRONMENT variable so dautostart can know which
+   DE it's in.  (otherwise those variables will be ignored)
