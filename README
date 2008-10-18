@@ -1,0 +1,12 @@
+dautostart is a simple standalone script that autostarts applications according to the
+freedesktop autostart spec ( http://standards.freedesktop.org/autostart-spec/autostart-spec-latest.html )
+
+It's intended for end-users building their own environment (although
+everyone - including DE projects - is free to use this)
+
+It's written in sh.  It only depends on sh. nothing else.
+
+Currently dautostart is in a very early phase of development and not ready
+for production use.
+
+This software is licensed using the GPL3 license.  See COPYING.
