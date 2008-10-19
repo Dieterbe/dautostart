@@ -57,6 +57,40 @@ $new"
 	done <<< "$new_list"
 }
 
+
+# This function tries to execute a command for an entry
+# $1 Command
+try_exec (){
+if test "x$1" != "x"
+then
+	read executable args <<< "$@" 2>/dev/null
+	base=`basename $executable`
+	if test "$base" = "$executable" # we did not get a full path, just a basename
+	then
+		path=`which "$base" 2>/dev/null`
+		if test $? -eq 0 -a -x "$path"
+		then
+			echo "Executing $path $args & ...."
+			$path $args &
+			return 0
+		else
+			return 2
+		fi
+	else
+		if test -x "$executable"
+		then
+			echo "Executing $executable $args & ...."
+			$executable $args &
+			return 0
+		else
+			return 3
+		fi
+	fi
+else
+	return 1
+fi
+}
+
 # This function processes all entries of the list and does whatever needs to be done.
 process_entries () {
 while read file
@@ -82,19 +116,16 @@ do
 		fi
 	fi
 	
-	try_exec=`grep -E "^TryExec=" "$file" | cut -d'=' -f2`
-	if test "$try_exec" && test -x "$try_exec"
+	cmd=`grep -E "^TryExec=" "$file" | cut -d'=' -f2`
+	try_exec $cmd
+	if test $? -gt 0
 	then
-		which "$try_exec"
-		echo "executing $try_exec ...."
-		#$try_exec &
-	else
 		# Exec key is not documented in spec but all my .desktop files have this, so ...
-		exec_cmd=`grep -E "^Exec=" "$file" | cut -d'=' -f2`
-		if test "$exec_cmd" && test -x "$exec_cmd"
+		cmd=`grep -E "^Exec=" "$file" | cut -d'=' -f2`
+		try_exec $cmd
+		if test $? -gt 0
 		then
-			echo "executing $exec_cmd ...."
-		#	$exec_cmd &
+			echo "Could not find an executable in \$PATH for $cmd ..." >&2
 		fi
 	fi
 
