@@ -3,8 +3,6 @@
 # Keep in mind this is sh code. not bash.  No bashishms allowed!
 # to use OnlyShowIn and NotShowIn, set the DESKTOP_ENVIRONMENT variable (this is not a standardized variable.  I came up with it)
 
-# WORK IN PROGRESS !! DOES NOT WORK !! 
-
 echo " ** dautostart starting..."
 
 # This functions maintains the list of desktop files to be used.  It adds absolute paths to the list and removes 'overruled' items.
