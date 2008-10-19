@@ -1,3 +1,5 @@
  * it doesn't work yet
+ * post to fd.org ML and ask about all those keys that are not documented
+   but my .desktop files seem to have (Exec, Terminal, ...)
  * support for "Autostart Of Applications After Mount"  (How will we ask
 conformation from user? zenity? xmessage? on commandline?)
