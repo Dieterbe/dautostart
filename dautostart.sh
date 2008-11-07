@@ -1,6 +1,5 @@
-#!/bin/sh
-
-# Keep in mind this is sh code. not bash.  No bashishms allowed!
+#!/bin/bash
+# Keep in mind this is sh code. not bash.  No bashishms allowed! --> TODO: fix the '"while read file; do <foo>; done <<< "$bar"' bashishms and go back to /bin/sh
 # to use OnlyShowIn and NotShowIn, set the DESKTOP_ENVIRONMENT variable (this is not a standardized variable.  I came up with it)
 
 echo " ** dautostart starting..."
@@ -93,40 +92,46 @@ fi
 process_entries () {
 while read file
 do
-	echo "Processing $file ..."
-	if grep -q -E "^Hidden=true" "$file"
+	if test "x$file" != x #TODO: this should never happen.. but it does because even if $full_list is empty, it will iterate :s
 	then
-		break
-	fi
-	if test "x$DESKTOP_ENVIRONMENT" != "x" #if we don't know which DE this is, we can't use the variables OnlyShowIn and NotShowIn
-	then
-		# Note that the autostart specs mentions "a list of strings identifying the DE's". We cannot be 100% accurate.
-		if grep -Eq "^OnlyShowIn=" "$file"
+		echo "Processing $file ..."
+		if grep -q -E "^Hidden=true" "$file"
 		then
-			if grep -E "^OnlyShowIn=" "$file" | grep -qv "$DESKTOP_ENVIRONMENT"
+			echo "..Hidden=true -> skipped"
+			continue
+		fi
+		if test "x$DESKTOP_ENVIRONMENT" != "x" #if we don't know which DE this is, we can't use the variables OnlyShowIn and NotShowIn
+		then
+			# Note that the autostart specs mentions "a list of strings identifying the DE's". We cannot be 100% accurate.
+			if grep -Eq "^OnlyShowIn=" "$file"
 			then
-				break
+				if grep -E "^OnlyShowIn=" "$file" | grep -qv "$DESKTOP_ENVIRONMENT"
+				then
+					echo "..OnlyShowIn!=$DESKTOP_ENVIRONMENT -> skipped"
+					continue
+				fi
+			fi
+			if grep -E "^NotShowIn=" "$file" | grep -q "$DESKTOP_ENVIRONMENT"
+			then
+				echo "..NotShowIn=$DESKTOP_ENVIRONMENT -> skipped"
+				continue
 			fi
 		fi
-		if grep -E "^NotShowIn=" "$file" | grep -q "$DESKTOP_ENVIRONMENT"
-		then
-			break
-		fi
-	fi
-	
-	cmd=`grep -E "^TryExec=" "$file" | cut -d'=' -f2`
-	try_exec $cmd
-	if test $? -gt 0
-	then
-		# Exec key is not documented in spec but all my .desktop files have this, so ...
-		cmd=`grep -E "^Exec=" "$file" | cut -d'=' -f2`
+
+		cmd=`grep -E "^TryExec=" "$file" | cut -d'=' -f2`
 		try_exec $cmd
 		if test $? -gt 0
 		then
-			echo "Could not find an executable in \$PATH for $cmd ..." >&2
+			# Exec key is not documented in spec but all my .desktop files have this, so ...
+			cmd=`grep -E "^Exec=" "$file" | cut -d'=' -f2`
+			try_exec $cmd
+			if test $? -gt 0
+			then
+				echo "Could not find an executable in \$PATH for $cmd ..." >&2
+			fi
 		fi
 	fi
-
+fi
 done <<< "$full_list"
 }
 
