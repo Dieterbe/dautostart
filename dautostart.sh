@@ -67,7 +67,7 @@ then
 		path=`which "$base" 2>/dev/null`
 		if test $? -eq 0 -a -x "$path"
 		then
-			echo "Executing $path $args & ...."
+			echo "$path $args & ..."
 			$path $args &
 			return 0
 		else
@@ -76,7 +76,7 @@ then
 	else
 		if test -x "$executable"
 		then
-			echo "Executing $executable $args & ...."
+			echo "$executable $args & ..."
 			$executable $args &
 			return 0
 		else
@@ -94,10 +94,10 @@ while read file
 do
 	if test "x$file" != x #TODO: this should never happen.. but it does because even if $full_list is empty, it will iterate :s
 	then
-		echo "Processing $file ..."
+		echo -n "> $file > " | sed -s "s#$HOME#~#"
 		if grep -q -E "^Hidden=true" "$file"
 		then
-			echo "..Hidden=true -> skipped"
+			echo "Hidden=true. skipped"
 			continue
 		fi
 		if test "x$DESKTOP_ENVIRONMENT" != "x" #if we don't know which DE this is, we can't use the variables OnlyShowIn and NotShowIn
@@ -107,13 +107,13 @@ do
 			then
 				if grep -E "^OnlyShowIn=" "$file" | grep -qv "$DESKTOP_ENVIRONMENT"
 				then
-					echo "..OnlyShowIn!=$DESKTOP_ENVIRONMENT -> skipped"
+					echo "OnlyShowIn!=$DESKTOP_ENVIRONMENT. skipped"
 					continue
 				fi
 			fi
 			if grep -E "^NotShowIn=" "$file" | grep -q "$DESKTOP_ENVIRONMENT"
 			then
-				echo "..NotShowIn=$DESKTOP_ENVIRONMENT -> skipped"
+				echo "NotShowIn=$DESKTOP_ENVIRONMENT. skipped"
 				continue
 			fi
 		fi
@@ -131,7 +131,6 @@ do
 			fi
 		fi
 	fi
-fi
 done <<< "$full_list"
 }
 
